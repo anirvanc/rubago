@@ -53,20 +53,24 @@ data Delay = DepartureDelay Leg Time
 data Journey = Journey [Leg] deriving (Show)
 
 class Connected a where
+    (|<->|) :: a -> a -> Network
+    a |<->| b = Connection (a |->| b) (b |->| a)
     (|<=>|) :: a -> a -> Network
-    a |<=>| b = Connection (a |=>| b) (b |=>| a)
+    (|<=>|) = (|<->|)
 
-    (|=>|)  :: a -> a -> Network
+    (|->|)  :: a -> a -> Network
 
 instance Connected Station where
-    a |=>|  b  = Connection (Terminal (RailLeaf a)) (Terminal (RailLeaf b))
+    a |->| b  = Connection (Terminal (RailLeaf a)) (Terminal (RailLeaf b))
 
 instance Connected Stop where
-    a |=>|  b = Connection (Terminal (BusLeaf a)) (Terminal (BusLeaf b))
+    a |->| b = Connection (Terminal (BusLeaf a)) (Terminal (BusLeaf b))
     
 fgw :: Network
 fgw =
-    pad |<=>| oxf
+    pad |<=>| rdg -- |<=>| did
     where
         pad = Station "PAD"
         oxf = Station "OXF"
+        did = Station "DID"
+        rdg = Station "RDG"
